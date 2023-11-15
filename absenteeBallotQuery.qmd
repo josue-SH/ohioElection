@@ -1,0 +1,34 @@
+---
+title: "absenteeBallots"
+author: "Josue Sanchez Hernandez"
+format: pdf
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyr)
+library(httr)
+library(rvest)
+library(readxl)
+library(xml2)
+library(XML)
+```
+
+## Reading in Data
+
+```{r}
+# Assigning the URL of the Ohio elections website to an object
+url <- "https://www.ohiosos.gov/elections/voters/about-this-election/2023-general-absenteereport/"
+
+# Sending GET request to get webpage contents
+webpage <- GET(url, add_headers('user-agent' = 'Absentee Ballot Count data scraper ([[jsanchezhernandez21@amherst.edu]])'))
+
+# Extracting links to all .xlsx files on the website
+xlsx_links <- webpage |>
+  read_html() |>
+  html_node('.xlsx') |>
+  html_text()
+```
