@@ -13,7 +13,7 @@ library(tidyr)
 library(httr)
 library(rvest)
 library(readxl)
-library(xml2)
+library(polite)
 library(XML)
 ```
 
@@ -24,11 +24,38 @@ library(XML)
 url <- "https://www.ohiosos.gov/elections/voters/about-this-election/2023-general-absenteereport/"
 
 # Sending GET request to get webpage contents
-webpage <- GET(url, add_headers('user-agent' = 'Absentee Ballot Count data scraper ([[jsanchezhernandez21@amherst.edu]])'))
+webpage <- GET(url, add_headers('user-agent' = ''))
 
 # Extracting links to all .xlsx files on the website
 xlsx_links <- webpage |>
   read_html() |>
   html_node('.xlsx') |>
   html_text()
+```
+
+```{r}
+
+page <- url |>
+  bow() |>
+  scrape()
+```
+
+```{r}
+url2 <- "https://www.ohiosos.gov/globalassets/elections/2023/gen/ohiososabreport-20231110.xlsx"
+
+response <- GET(url, write_disk("downloaded_file.xlsx", overwrite = TRUE))
+
+# Check if the download was successful
+if (http_status(response)$status_type == "Success") {
+  # Read the downloaded Excel file into a data frame
+  data <- read_excel("downloaded_file.xlsx")
+
+  # View the structure of the data frame
+  str(data)
+
+  # View the first few rows of the data frame
+  head(data)
+} else {
+  cat("Failed to download the file.\n")
+}
 ```
