@@ -13,7 +13,6 @@ library(tidyr)
 library(httr)
 library(rvest)
 library(readxl)
-library(polite)
 library(XML)
 ```
 
@@ -34,6 +33,41 @@ xlsx_links <- webpage |>
 ```
 
 ```{r}
-customUserAgent <- "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-webpage2 <- read_html(url, user_agent(customUserAgent))
+url2 <- "https://www.ohiosos.gov/globalassets/elections/2023/gen/ohiososabreport-20231106.xlsx"
+
+customHeaders <- c(
+  "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+  "Accept-Language" = "en-US,en;q=0.5",
+  "Accept-Encoding" = "gzip, deflate, br",
+  "Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+  "Referer" = "https://www.google.com/"
+  )
+
+webpage2 <- GET(url2, add_headers(customHeaders))
+
+print(webpage2)
+```
+
+```{r}
+library(RSelenium)
+
+rD <- rsDriver(browser = "firefox",
+               chromever = NULL)
+remDr <- rD$client
+
+remDr$navigate("https://www.ohiosos.gov/globalassets/elections/2023/gen/ohiososabreport-20231113.xlsx")
+
+file_links <- remDr$findElements(using = "css selector", value = "a[href$='.xlsx']")
+
+for (link in file_links) {
+  link$click()
+  Sys.sleep(5)
+  
+}
+remDr$close()
+
+```
+
+```{r}
+
 ```
