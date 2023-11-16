@@ -55,9 +55,11 @@ rD <- rsDriver(browser = "firefox",
                chromever = NULL)
 remDr <- rD$client
 
-remDr$navigate("https://www.ohiosos.gov/globalassets/elections/2023/gen/ohiososabreport-20231113.xlsx")
+remDr$navigate(url)
 
-file_links <- remDr$findElements(using = "css selector", value = "a[href$='.xlsx']")
+file_links <- remDr$findElements(using = "css", value = "a[href$='.xlsx']")
+
+urls <- file_links$getElementAttribute("href")[[1]]
 
 for (link in file_links) {
   link$click()
@@ -70,4 +72,8 @@ remDr$close()
 
 ```{r}
 
+xlsx_names <- data.frame()
+
+for(i in vector) {
+}
 ```
