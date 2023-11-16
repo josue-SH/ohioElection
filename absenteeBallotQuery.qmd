@@ -59,8 +59,18 @@ remDr$navigate(url)
 
 file_links <- remDr$findElements(using = "css", value = "a[href$='.xlsx']")
 
-urls <- file_links$getElementAttribute("href")[[1]]
+getURL <- function(webElement){
+ if("href" %in% names(webElement$getElementAttribute())){
+    return(webElement$getElementAttribute("href")[[1]])
+  }
+  else {
+    return(NULL)
+  }
+}
 
+urls <- lapply(file_links, getURL)
+  
+  
 for (link in file_links) {
   link$click()
   Sys.sleep(5)
