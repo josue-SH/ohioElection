@@ -10,8 +10,6 @@ editor: visual
 #| include: false
 
 library(tidyr)
-library(httr)
-library(rvest)
 library(readxl)
 library(XML)
 ```
@@ -60,30 +58,28 @@ remDr$navigate(url)
 file_links <- remDr$findElements(using = "css", value = "a[href$='.xlsx']")
 
 getURL <- function(webElement){
- if("href" %in% names(webElement$getElementAttribute())){
     return(webElement$getElementAttribute("href")[[1]])
-  }
-  else {
-    return(NULL)
-  }
 }
 
 urls <- lapply(file_links, getURL)
-  
-  
-for (link in file_links) {
-  link$click()
-  Sys.sleep(5)
-  
-}
-remDr$close()
+
+remDr$close()  
+rm(rD)
+rm(remDr)
 
 ```
 
 ```{r}
 
-xlsx_names <- data.frame()
-
-for(i in vector) {
+for (link in 1:length(urls)) {
+  rD2<- rsDriver(browser = "firefox",
+               chromever = NULL)
+  remDr2 <- rD2$client
+  remDr2$navigate(urls[[link]])
+  Sys.sleep(3)
+  remDr2$close()
+  rD2[["server"]]$stop()
 }
+
+
 ```
