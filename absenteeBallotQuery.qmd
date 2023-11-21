@@ -7,16 +7,54 @@ editor: visual
 
 ```{r}
 #| label: setup
-#| include: false
 
 library(tidyr)
 library(readxl)
 library(XML)
+library(sqldf)
+library(dplyr)
+library(lubridate)
+library(janitor)
 ```
 
-## Reading in Data
+## Reading in data
 
-The data for absentee ballot counts in Ohio can be found on the [Secretary of State's Website.](https://www.ohiosos.gov/elections/voters/about-this-election/2023-general-absenteereport/) I tried to download it through various methods for reproducibility, but ran into various issues with my httr calls.
+The data for absentee ballot counts in Ohio can be found on the [Secretary of State's Website.](https://www.ohiosos.gov/elections/voters/about-this-election/2023-general-absenteereport/) I tried to download it through various methods for reproducibility, but ran into various issues with my httr calls. I decided to instead download each excel file individually and read them in with the readxl package.
 
-```{}
+```{r}
+#| label: read
+
+folder_path <- "./data"
+xlsx_names <- list.files(path = folder_path, pattern = "\\.xlsx$", full.names = TRUE)
+
+readFolder <- function(file) {
+  #sheet_name <- "Sheet1"  # Change to the desired sheet name or index
+  return(read_excel(file))
+}
+
+xlsx_list <- lapply(xlsx_names, readFolder)
+
+```
+
+Now we have all of the counts for absentee ballots in a list of dataframes (tables).
+
+## Querying the data
+
+First, we're going to select the data that corresponds to the month of August. To accomplish this, we'll be using the sqldf package to select all the dataframes in the list. To make the process of filtering easier, we will be using the dplyr and lubridate package to clean up the names and values of the variables.
+
+```{r}
+cleanList <- function(df) {
+  clean <- janitor::clean_names(df) %>%
+    mutate(date = as_date(data_reporting_date))
+  
+  return(clean)
+}
+
+xlsx_list_clean <- lapply(xlsx_list, cleanList)
+
+selectAug <- function(df) {
+  sqldf("SELECT * FROM df WHERE date BETWEEN '2023-08-01' AND '2023-08-12'")
+}
+subsetAug <- lapply(xlsx_list_clean, selectAug)
+
 ```
